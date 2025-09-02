@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles for the portfolio website */
+body {
+    @apply bg-gradient-to-r from-blue-500 to-teal-500 text-white;
+}
+
+h1, h2, h3 {
+    @apply font-sans font-bold;
+}
+
+p {
+    @apply font-sans;
+}
+
+section {
+    @apply py-16 px-4;
+}
+
+.hero {
+    @apply flex items-center justify-center h-screen text-center;
+}
+
+.about, .skills, .projects, .testimonials, .contact {
+    @apply max-w-4xl mx-auto;
+}
+
+.project-thumbnail {
+    @apply transition-transform duration-300 transform hover:scale-105;
+}
+
+.testimonial {
+    @apply border-l-4 border-teal-500 pl-4 mb-4;
+}
+
+.contact-form {
+    @apply flex flex-col space-y-4;
+}
+
+.footer {
+    @apply bg-gray-800 text-gray-400 py-4 text-center;
+}
+
+.navbar {
+    @apply sticky top-0 bg-white shadow-md z-10;
+}
+
+.navbar a {
+    @apply text-gray-800 hover:text-teal-500;
+}
