@@ -1,16 +1,50 @@
-import React, { useRef, useLayoutEffect, useState } from 'react';
+import React, { useRef, useLayoutEffect, useState } from "react";
 import {
-    motion,
-    useScroll,
-    useSpring,
-    useTransform,
-    useMotionValue,
-    useVelocity,
-    useAnimationFrame
+  motion,
+  useScroll,
+  useSpring,
+  useTransform,
+  useMotionValue,
+  useVelocity,
+  useAnimationFrame,
 } from "framer-motion";
-import { FaPython } from "react-icons/fa";
-import { SiMysql } from "react-icons/si";
-import { TbRobot, TbSparkles } from "react-icons/tb";
+import {
+  FaJs, FaPython, FaHtml5, FaCss3Alt, FaNodeJs, FaGitAlt, FaGithub,
+  FaBug, FaTerminal, FaCodeBranch, FaCogs
+} from 'react-icons/fa';
+import {
+  SiTypescript, SiTailwindcss, SiExpress, SiPython, SiMysql
+} from 'react-icons/si';
+import { TbApi } from "react-icons/tb";
+import { MdSecurity } from "react-icons/md";
+
+const skills = [
+  "Python", "JavaScript", "TypeScript", "HTML", "CSS", "TailwindCSS", "Bash", "MySQL", "Tkinter", "Git", "GitHub", "GitHub Actions", "VS Code",
+  "REST APIs", "GitHub Pages", "Node.js", "Express.js", "Open-source collaboration", "Debugging", "CI/CD workflows"
+];
+
+const skillIconMap: Record<string, React.ReactNode> = {
+  Python: <FaPython className="text-yellow-300" />,
+  JavaScript: <FaJs className="text-yellow-400" />,
+  TypeScript: <SiTypescript className="text-blue-300" />,
+  HTML: <FaHtml5 className="text-orange-400" />,
+  CSS: <FaCss3Alt className="text-blue-400" />,
+  TailwindCSS: <SiTailwindcss className="text-cyan-300" />,
+  Bash: <FaTerminal className="text-green-300" />,
+  MySQL: <SiMysql className="text-blue-500" />,
+  Tkinter: <SiPython className="text-yellow-200" />,
+  Git: <FaGitAlt className="text-orange-500" />,
+  GitHub: <FaGithub />,
+  "GitHub Actions": <FaCodeBranch className="text-blue-400" />,
+  "VS Code": <FaTerminal className="text-blue-400" />,
+  "REST APIs": <TbApi className="text-emerald-300" />,
+  "GitHub Pages": <FaGithub className="text-purple-300" />,
+  "Node.js": <FaNodeJs className="text-green-600" />,
+  "Express.js": <SiExpress className="text-gray-100" />,
+  "Open-source collaboration": <FaCogs className="text-green-200" />,
+  Debugging: <FaBug className="text-red-400" />,
+  "CI/CD workflows": <MdSecurity className="text-yellow-400" />,
+};
 
 interface VelocityMapping {
     input: [number, number];
@@ -57,61 +91,22 @@ function useElementWidth<T extends HTMLElement>(ref: React.RefObject<T | null>):
             }
         }
         updateWidth();
-        window.addEventListener('resize', updateWidth);
-        return () => window.removeEventListener('resize', updateWidth);
+        window.addEventListener("resize", updateWidth);
+        return () => window.removeEventListener("resize", updateWidth);
     }, [ref]);
 
     return width;
 }
 
-const ScrollVelocity: React.FC<ScrollVelocityProps> = ({
+const VelocityText: React.FC<VelocityTextProps> = React.memo(({
+    children,
+    baseVelocity,
     scrollContainerRef,
-    texts = [],
-    velocity = 5,
     className = '',
     damping = 50,
     stiffness = 400,
-    numCopies = 6,
+    numCopies = 4,
     velocityMapping = { input: [0, 1000], output: [0, 5] },
-    parallaxClassName,
-    scrollerClassName,
-    parallaxStyle,
-    scrollerStyle
-}) => {
-    return (
-        <div>
-            {texts.map((text: React.ReactNode, index: number) => (
-                <VelocityText
-                    key={index}
-                    className={className}
-                    baseVelocity={index % 2 !== 0 ? -velocity : velocity} // Use the velocity from ScrollVelocity's props
-                    scrollContainerRef={scrollContainerRef}
-                    damping={damping}
-                    stiffness={stiffness}
-                    numCopies={numCopies}
-                    velocityMapping={velocityMapping}
-                    parallaxClassName={parallaxClassName}
-                    scrollerClassName={scrollerClassName}
-                    parallaxStyle={parallaxStyle}
-                    scrollerStyle={scrollerStyle}
-                >
-                    {text}&nbsp;
-                </VelocityText>
-            ))}
-        </div>
-    );
-};
-
-// Extracted VelocityText component
-const VelocityText: React.FC<VelocityTextProps> = React.memo(({
-    children,
-    baseVelocity, // No default here, it's expected from parent
-    scrollContainerRef,
-    className = '',
-    damping,
-    stiffness,
-    numCopies = 6, // Provide a default here for robustness
-    velocityMapping,
     parallaxClassName,
     scrollerClassName,
     parallaxStyle,
@@ -122,13 +117,13 @@ const VelocityText: React.FC<VelocityTextProps> = React.memo(({
     const { scrollY } = useScroll(scrollOptions);
     const scrollVelocity = useVelocity(scrollY);
     const smoothVelocity = useSpring(scrollVelocity, {
-        damping: damping ?? 50,
-        stiffness: stiffness ?? 400
+        damping: damping,
+        stiffness: stiffness,
     });
     const velocityFactor = useTransform(
         smoothVelocity,
-        velocityMapping?.input || [0, 1000],
-        velocityMapping?.output || [0, 5],
+        velocityMapping.input,
+        velocityMapping.output,
         { clamp: false }
     );
 
@@ -162,7 +157,7 @@ const VelocityText: React.FC<VelocityTextProps> = React.memo(({
     });
 
     const spans = [];
-    for (let i = 0; i < numCopies; i++) { // numCopies is now guaranteed to have a default
+    for (let i = 0; i < numCopies; i++) {
         spans.push(
             <span className={`flex-shrink-0 ${className}`} key={i} ref={i === 0 ? copyRef : null}>
                 {children}
@@ -173,7 +168,7 @@ const VelocityText: React.FC<VelocityTextProps> = React.memo(({
     return (
         <div className={`${parallaxClassName} relative overflow-hidden`} style={parallaxStyle}>
             <motion.div
-                className={`${scrollerClassName} flex whitespace-nowrap text-center font-sans text-3xl font-bold tracking-[-0.02em] drop-shadow md:text-4xl`}
+                className={`${scrollerClassName} flex whitespace-nowrap`}
                 style={{ x, ...scrollerStyle }}
             >
                 {spans}
@@ -182,41 +177,81 @@ const VelocityText: React.FC<VelocityTextProps> = React.memo(({
     );
 });
 
-const Skills: React.FC = () => {
-    const skillsData = [
-        { name: 'Python', icon: FaPython },
-        { name: 'MySQL', icon: SiMysql },
-        { name: 'Artificial Intelligence', icon: TbRobot },
-        { name: 'Prompt Engineering', icon: TbSparkles }
-    ];
-
-    // Split skills into two lines for the scrolling effect
-    const renderSkillsLine = (skills: typeof skillsData) => (
-        <>
-            {skills.map(({ name, icon: Icon }) => (
-                <span key={name} className="inline-flex items-center mx-6">
-                    <Icon className="text-3xl md:text-4xl" />
-                    <span className="ml-3">{name}</span>
-                    <span className="ml-6 font-sans">•</span>
-                </span>
-            ))}
-        </>
-    );
-
-    const midPoint = Math.ceil(skillsData.length / 2);
-    const scrollingTexts = [
-        renderSkillsLine(skillsData.slice(0, midPoint)),
-        renderSkillsLine(skillsData.slice(midPoint))
-    ];
-
-    return (
-        <section className="bg-gradient-to-r from-blue-500 to-teal-500 py-20 overflow-hidden">
-            <div className="container mx-auto text-center">
-                <h2 className="text-4xl font-bold text-white mb-12">My Skills</h2>
-                <ScrollVelocity texts={scrollingTexts} velocity={2} scrollerClassName="text-white" />
-            </div>
-        </section>
-    );
+const ScrollVelocity: React.FC<ScrollVelocityProps> = ({
+  scrollContainerRef,
+  texts = [],
+  velocity = 25,
+  className = "",
+  damping = 50,
+  stiffness = 400,
+  numCopies = 4,
+  velocityMapping = { input: [0, 1000], output: [0, 5] },
+  parallaxClassName,
+  scrollerClassName,
+  parallaxStyle,
+  scrollerStyle,
+}) => {
+  return (
+    <div>
+      {texts.map((text: React.ReactNode, index: number) => (
+        <VelocityText
+          key={index}
+          className={className}
+          baseVelocity={index % 2 !== 0 ? -velocity : velocity}
+          scrollContainerRef={scrollContainerRef}
+          damping={damping}
+          stiffness={stiffness}
+          numCopies={numCopies}
+          velocityMapping={velocityMapping}
+          parallaxClassName={parallaxClassName}
+          scrollerClassName={scrollerClassName}
+          parallaxStyle={parallaxStyle}
+          scrollerStyle={scrollerStyle}
+        >
+          {text}
+        </VelocityText>
+      ))}
+    </div>
+  );
 };
 
-export default Skills;
+const gradientTextClass = 'bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400';
+
+const Skills: React.FC = () => {
+  const half = Math.ceil(skills.length / 2);
+  const skills1 = skills.slice(0, half);
+  const skills2 = skills.slice(half);
+
+  const renderSkills = (skillList: string[]) => (
+    <React.Fragment>
+      {skillList.map((skill) => {
+        const icon = skillIconMap[skill] || null;
+        return (
+          <span
+            key={skill}
+            className={`inline-flex items-center gap-2 bg-foreground/10 text-foreground px-4 py-2 rounded-full text-base font-space-grotesk ${gradientTextClass} mx-2`}
+            title={skill}
+          >
+            {icon}
+            <span>{skill}</span>
+          </span>
+        );
+      })}
+    </React.Fragment>
+  );
+
+  const skillSets = [renderSkills(skills1), renderSkills(skills2)];
+
+  return (
+    <section className="bg-gradient-to-r from-blue-500 to-teal-500 py-20 overflow-hidden">
+        <div className="container mx-auto text-center">
+            <h2 className="text-4xl font-bold text-white mb-12">My Skills</h2>
+            <div className="w-full space-y-4">
+                <ScrollVelocity texts={skillSets} velocity={25} className="flex" />
+            </div>
+        </div>
+    </section>
+  );
+};
+
+export default React.memo(Skills);
