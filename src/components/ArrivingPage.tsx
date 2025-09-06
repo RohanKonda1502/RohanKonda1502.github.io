@@ -2,69 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 // The error "Cannot find module 'three'..." suggests that the type definitions are missing.
 // Please run `npm install @types/three` or `yarn add @types/three` to fix this.
 import * as THREE from 'three';
-
-/**
- * The PortfolioSite component is defined outside of PortfolioLanding to prevent it from being
- * recreated on every render of the parent component. This is a standard React best practice
- * that improves performance and prevents unexpected state loss.
- */
-const PortfolioSite = ({ onReplay }: { onReplay: () => void }) => (
-  <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white overflow-hidden">
-    <div className="absolute inset-0 bg-black/20"></div>
-    <div className="relative z-10 container mx-auto px-6 py-20">
-      <div className="text-center mb-20">
-        <h1 className="text-7xl font-bold mb-6 bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-pulse">
-          Welcome to My Portfolio
-        </h1>
-        <p className="text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-          Crafting extraordinary digital experiences with precision, creativity, and cutting-edge technology
-        </p>
-      </div>
-
-      <div className="grid md:grid-cols-3 gap-10 mb-20">
-        <div className="group bg-gradient-to-br from-cyan-500/10 to-blue-500/10 backdrop-blur-lg rounded-2xl p-8 border border-cyan-500/20 hover:border-cyan-500/50 transition-all duration-500 transform hover:scale-105 hover:-translate-y-2">
-          <div className="mb-6">
-            <div className="w-16 h-16 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full flex items-center justify-center mb-4">
-              <span className="text-2xl">⚡</span>
-            </div>
-          </div>
-          <h3 className="text-3xl font-bold mb-4 text-cyan-400">Frontend Mastery</h3>
-          <p className="text-gray-300 text-lg leading-relaxed">Creating lightning-fast, responsive interfaces that captivate users and deliver exceptional experiences across all devices.</p>
-        </div>
-
-        <div className="group bg-gradient-to-br from-purple-500/10 to-pink-500/10 backdrop-blur-lg rounded-2xl p-8 border border-purple-500/20 hover:border-purple-500/50 transition-all duration-500 transform hover:scale-105 hover:-translate-y-2">
-          <div className="mb-6">
-            <div className="w-16 h-16 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full flex items-center justify-center mb-4">
-              <span className="text-2xl">🎬</span>
-            </div>
-          </div>
-          <h3 className="text-3xl font-bold mb-4 text-purple-400">3D Cinematics</h3>
-          <p className="text-gray-300 text-lg leading-relaxed">Bringing ideas to life with immersive 3D worlds, smooth animations, and cinematic experiences that leave lasting impressions.</p>
-        </div>
-
-        <div className="group bg-gradient-to-br from-pink-500/10 to-rose-500/10 backdrop-blur-lg rounded-2xl p-8 border border-pink-500/20 hover:border-pink-500/50 transition-all duration-500 transform hover:scale-105 hover:-translate-y-2">
-          <div className="mb-6">
-            <div className="w-16 h-16 bg-gradient-to-r from-pink-400 to-rose-500 rounded-full flex items-center justify-center mb-4">
-              <span className="text-2xl">✨</span>
-            </div>
-          </div>
-          <h3 className="text-3xl font-bold mb-4 text-pink-400">Design Innovation</h3>
-          <p className="text-gray-300 text-lg leading-relaxed">Designing intuitive interfaces that seamlessly blend functionality with stunning aesthetics and user-centered experiences.</p>
-        </div>
-      </div>
-
-      <div className="text-center">
-        <button
-          onClick={onReplay}
-          className="group relative bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 hover:from-cyan-600 hover:via-purple-600 hover:to-pink-600 text-white font-bold py-4 px-12 rounded-2xl transition-all duration-500 transform hover:scale-110 text-xl shadow-2xl"
-        >
-          <span className="relative z-10">Replay Intro</span>
-          <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 rounded-2xl blur opacity-30 group-hover:opacity-50 transition-opacity duration-500"></div>
-        </button>
-      </div>
-    </div>
-  </div>
-);
+import MainContent from './MainContent';
 
 const PortfolioLanding = () => {
   const mountRef = useRef<HTMLDivElement>(null);
@@ -72,10 +10,9 @@ const PortfolioLanding = () => {
   const [showPortfolio, setShowPortfolio] = useState(false);
   const [introFinished, setIntroFinished] = useState(false);
 
-  const handleSkip = () => {
-    // Immediately transition to the portfolio view
-    setIntroFinished(true);
-    setShowPortfolio(true);
+  const handleReplay = () => {
+    setShowPortfolio(false);
+    setIntroFinished(false);
   };
 
   useEffect(() => {
@@ -430,6 +367,7 @@ const PortfolioLanding = () => {
 
     // Start animation function
     const startAnimation = () => {
+      document.getElementById('loading-overlay')?.classList.add('opacity-0');
       if (animationStarted) return;
       animationStarted = true;
       timeline.phase = 'lightRay';
@@ -591,10 +529,7 @@ const PortfolioLanding = () => {
   }, [introFinished]);
 
   if (showPortfolio) {
-    return <PortfolioSite onReplay={() => {
-      setShowPortfolio(false);
-      setIntroFinished(false);
-    }} />;
+    return <MainContent onReplay={handleReplay} />;
   }
 
   return (
@@ -603,14 +538,8 @@ const PortfolioLanding = () => {
       
       {/* This overlay is shown before the animation starts. */}
       {!introFinished && (
-        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/70 backdrop-blur-sm">
+        <div id="loading-overlay" className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/70 backdrop-blur-sm transition-opacity duration-1000">
           <p className="text-white text-2xl animate-pulse mb-8">Loading Experience...</p>
-          <button
-            onClick={handleSkip}
-            className="px-6 py-2 text-lg text-cyan-300 border border-cyan-300 rounded-lg transition-colors duration-300 hover:bg-cyan-300/20"
-          >
-            Skip Intro
-          </button>
         </div>
       )}
     </div>
