@@ -1,26 +1,23 @@
-import React from 'react';
-import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import About from './components/About';
-import Skills from './components/Skills';
-import Projects from './components/Projects';
-import Testimonials from './components/Testimonials';
-import Contact from './components/Contact';
-import Footer from './components/Footer';
+import React, { useState } from 'react';
+import ArrivingPage from './ArrivingPage';
+import PortfolioPage from './PortfolioPage';
 
-const App: React.FC = () => {
-  return (
-    <div className="flex flex-col">
-      <Navbar />
-      <Hero />
-      <About />
-      <Skills />
-      <Projects />
-      <Testimonials />
-      <Contact />
-      <Footer />
-    </div>
+function App() {
+  const [showPortfolio, setShowPortfolio] = useState(false);
+
+  const handleIntroFinish = () => {
+    setShowPortfolio(true);
+  };
+
+  const handleReplay = () => {
+    setShowPortfolio(false);
+  };
+
+  return showPortfolio ? (
+    <PortfolioPage onReplay={handleReplay} />
+  ) : (
+    <ArrivingPage onIntroFinish={handleIntroFinish} />
   );
-};
+}
 
 export default App;
